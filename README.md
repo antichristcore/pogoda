@@ -1,1 +1,2 @@
 # pogoda
+Проект WebServer + API
