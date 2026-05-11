@@ -1,0 +1,126 @@
+ТЕХНИЧЕСКОЕ ЗАДАНИЕ
+Проект: Веб-приложение "Weather App" на Flask
+
+
+1. ОБЩАЯ ИНФОРМАЦИЯ
+
+Название: Weather App
+Цель: Веб-приложение для просмотра текущей погоды и прогноза по выбранному городу через внешний API.
+Язык: Python 3
+Framework: Flask
+
+
+2. ФУНКЦИОНАЛЬНЫЕ ТРЕБОВАНИЯ
+
+2.1 Основной функционал
+- Ввод названия города
+- Текущая погода: температура, влажность, скорость ветра, описание, иконка
+- Прогноз на несколько дней
+- История запросов
+
+2.2 Авторизация
+- Регистрация, вход, выход
+- Хранение данных пользователя в БД
+
+2.3 Личный кабинет
+- История поиска
+- Добавление/удаление городов в избранное
+
+2.4 REST API
+GET /api/weather/{city}
+Ответ: {"city": "Moscow", "temperature": 20, "humidity": 75}
+
+
+3. ТЕХНИЧЕСКИЕ ТРЕБОВАНИЯ
+
+Backend:   Python 3, Flask, Flask-SQLAlchemy, Flask-Login, Requests
+Frontend:  HTML5, CSS3, Bootstrap 5, Jinja2
+БД:        SQLite
+Внешний API: OpenWeatherMap (openweathermap.org/api)
+
+
+4. СТРУКТУРА ПРОЕКТА
+
+weather_app/
+├── app/
+│   ├── routes/
+│   ├── models/
+│   ├── templates/
+│   ├── static/
+│   ├── services/
+│   └── forms/
+├── config.py
+├── run.py
+├── requirements.txt
+└── .env
+
+
+5. ORM-МОДЕЛИ
+
+users:
+  id            Integer
+  username      String
+  email         String
+  password_hash String
+
+search_history:
+  id         Integer
+  user_id    Integer
+  city       String
+  created_at DateTime
+
+favorite_cities:
+  id      Integer
+  user_id Integer
+  city    String
+
+
+6. СТРАНИЦЫ САЙТА
+
+- Главная страница
+- Страница входа
+- Страница регистрации
+- Личный кабинет
+- Страница погоды
+
+
+7. ТРЕБОВАНИЯ К КОДУ
+
+Чистота:
+- Соблюдение PEP8
+- Разделение логики
+- Blueprint-архитектура
+- Комментарии к основным функциям
+
+Безопасность:
+- Хеширование паролей
+- Защита форм (CSRF)
+- API-ключи в .env
+
+
+8. ЗАВИСИМОСТИ (requirements.txt)
+
+Flask
+Flask-SQLAlchemy
+Flask-Login
+requests
+python-dotenv
+Werkzeug
+
+
+9. ЭТАПЫ РАЗРАБОТКИ
+
+1. Структура проекта
+2. Настройка Flask и Bootstrap
+3. Подключение API погоды
+4. База данных
+5. Авторизация
+6. История запросов
+7. REST API
+8. Тестирование
+
+
+10. ОЖИДАЕМЫЙ РЕЗУЛЬТАТ
+
+Полноценный веб-сайт с авторизацией, базой данных, REST API,
+адаптивным интерфейсом, внешним API и хранением пользовательских данных.
