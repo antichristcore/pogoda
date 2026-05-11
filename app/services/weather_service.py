@@ -1,7 +1,7 @@
 import requests
 from flask import current_app
 
-USE_MOCK = True
+USE_MOCK = False
 
 MOCK_WEATHER = {
     'city': '{city}',
@@ -26,13 +26,35 @@ MOCK_FORECAST = [
 ]
 
 
+WEATHER_ICONS = {
+    '01d': 'day.svg',
+    '01n': 'night.svg',
+    '02d': 'cloudy-day-1.svg',
+    '02n': 'cloudy-night-1.svg',
+    '03d': 'cloudy-day-2.svg',
+    '03n': 'cloudy-night-2.svg',
+    '04d': 'cloudy.svg',
+    '04n': 'cloudy.svg',
+    '09d': 'rainy-4.svg',
+    '09n': 'rainy-4.svg',
+    '10d': 'rainy-1.svg',
+    '10n': 'rainy-1.svg',
+    '11d': 'thunder.svg',
+    '11n': 'thunder.svg',
+    '13d': 'snowy-1.svg',
+    '13n': 'snowy-1.svg',
+    '50d': 'cloudy-day-3.svg',
+    '50n': 'cloudy-night-3.svg',
+}
+
+
 class WeatherService:
 
     def __init__(self):
         self.api_key = current_app.config['OPENWEATHER_API_KEY']
         self.base_url = current_app.config['OPENWEATHER_BASE_URL']
 
-    def get_current_weather(self, city: str) -> dict | None:
+    def get_current_weather(self, city):
         if USE_MOCK:
             data = MOCK_WEATHER.copy()
             data['city'] = city.capitalize()
@@ -56,7 +78,7 @@ class WeatherService:
         except requests.exceptions.RequestException:
             return {'error': 'Не удалось подключиться к сервису погоды'}
 
-    def get_forecast(self, city: str) -> dict | None:
+    def get_forecast(self, city):
         if USE_MOCK:
             return MOCK_FORECAST
 
@@ -75,7 +97,7 @@ class WeatherService:
         except requests.exceptions.RequestException:
             return None
 
-    def _parse_current(self, data: dict) -> dict:
+    def _parse_current(self, data):
         return {
             'city': data['name'],
             'country': data['sys']['country'],
@@ -84,13 +106,13 @@ class WeatherService:
             'humidity': data['main']['humidity'],
             'wind_speed': round(data['wind']['speed'], 1),
             'description': data['weather'][0]['description'].capitalize(),
-            'icon': data['weather'][0]['icon'],
+            'icon': f"/static/img/weather/{WEATHER_ICONS.get(data['weather'][0]['icon'], 'cloudy.svg')}",
             'icon_url': f"https://openweathermap.org/img/wn/{data['weather'][0]['icon']}@2x.png",
             'pressure': data['main']['pressure'],
             'visibility': data.get('visibility', 0) // 1000,
         }
 
-    def _parse_forecast(self, data: dict) -> list:
+    def _parse_forecast(self, data):
         daily = {}
         for item in data['list']:
             date = item['dt_txt'].split(' ')[0]
@@ -100,7 +122,7 @@ class WeatherService:
                     'temp_min': item['main']['temp_min'],
                     'temp_max': item['main']['temp_max'],
                     'description': item['weather'][0]['description'].capitalize(),
-                    'icon': item['weather'][0]['icon'],
+                    'icon': f"/static/img/weather/{WEATHER_ICONS.get(item['weather'][0]['icon'], 'cloudy.svg')}",
                     'icon_url': f"https://openweathermap.org/img/wn/{item['weather'][0]['icon']}@2x.png",
                     'humidity': item['main']['humidity'],
                     'wind_speed': round(item['wind']['speed'], 1),
