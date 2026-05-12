@@ -5,6 +5,7 @@ from app.models.user import SearchHistory, FavoriteCity
 from werkzeug.utils import secure_filename
 from app import db
 from app.forms.forms import ChangePasswordForm
+from datetime import timedelta, timezone
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 def allowed_file(filename):
@@ -22,7 +23,7 @@ def index():
                .limit(20)
                .all())
     favorites = FavoriteCity.query.filter_by(user_id=current_user.id).all()
-    return render_template('profile/index.html', history=history, favorites=favorites)
+    return render_template('profile/index.html', history=history, favorites=favorites, timedelta=timedelta)
 
 
 @profile_bp.route('/favorites/add', methods=['POST'])

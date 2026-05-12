@@ -18,6 +18,10 @@ def format_time(value):
     except (TypeError, IndexError):
         return '--:--'
 
+def format_datetime(value, offset=4):
+    from datetime import timedelta
+    local = value + timedelta(hours=offset)
+    return local.strftime('%d.%m.%Y %H:%M')
 
 def create_app(config_name='default'):
     app = Flask(__name__)

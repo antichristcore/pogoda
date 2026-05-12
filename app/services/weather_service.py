@@ -70,7 +70,25 @@ YANDEX_CONDITIONS = {
     'THUNDERSTORM_WITH_RAIN': 'Дождь с грозой',
     'THUNDERSTORM_WITH_HAIL': 'Гроза с градом',
 }
-
+WIND_DIRECTIONS = {
+    'CALM': 'Штиль',
+    'N': 'С',
+    'NNE': 'ССВ',
+    'NE': 'СВ',
+    'ENE': 'ВСВ',
+    'E': 'В',
+    'ESE': 'ВЮВ',
+    'SE': 'ЮВ',
+    'SSE': 'ЮЮВ',
+    'S': 'Ю',
+    'SSW': 'ЮЮЗ',
+    'SW': 'ЮЗ',
+    'WSW': 'ЗЮЗ',
+    'W': 'З',
+    'WNW': 'ЗСЗ',
+    'NW': 'СЗ',
+    'NNW': 'ССЗ',
+}
 
 class WeatherService:
 
@@ -121,6 +139,7 @@ class WeatherService:
               visibility
               precProbability
               uvIndex
+              windGust
             }
             forecast {
               days(limit: 5) {
@@ -179,7 +198,7 @@ class WeatherService:
 
         sunrise = days[0].get('sunriseTime', '--:--') if days else '--:--'
         sunset = days[0].get('sunsetTime', '--:--') if days else '--:--'
-
+        print(now.get('precProbability'))
         return {
             'city': city_name,
             'country': country,
@@ -189,11 +208,15 @@ class WeatherService:
             'wind_speed': round(now['windSpeed'], 1),
             'description': YANDEX_CONDITIONS.get(condition, condition).capitalize(),
             'icon': f"/static/img/weather/{YANDEX_ICONS.get(condition, 'cloudy.svg')}",
-            'pressure': now['pressure'],
+            'pressure': round(now['pressure'] * 0.750064),
             'visibility': round(now.get('visibility', 0) / 1000, 1),
             'sunrise': sunrise,
             'sunset': sunset,
-            'uv': now.get('uvIndex', 0),
+            'uv': now.get('uvIndex') or now.get('uv') or 0,
+            'wind_gust': round(now.get('windGust', 0), 1),
+            'wind_direction': WIND_DIRECTIONS.get(now.get('windDirection', ''), '—'),
+            'cloudiness': now.get('cloudiness', '—'),
+            'prec_probability': round(now.get('precProbability', 0) * 100),
         }
 
     def get_forecast(self, city):

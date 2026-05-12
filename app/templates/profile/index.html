@@ -101,7 +101,7 @@
                             <a href="{{ url_for('main.weather_page', city=entry.city) }}" class="text-decoration-none">
                                 <i class="bi bi-search me-1 text-muted"></i>{{ entry.city }}
                             </a>
-                            <small class="text-muted">{{ entry.created_at.strftime('%d.%m.%Y %H:%M') }}</small>
+                            <small class="text-muted">{{ (entry.created_at + timedelta(hours=4)).strftime('%d.%m.%Y %H:%M') }}</small>
                         </div>
                         {% endfor %}
                     </div>
