@@ -12,6 +12,12 @@ login_manager.login_view = 'auth.login'
 login_manager.login_message = 'Войдите в аккаунт для доступа к этой странице.'
 login_manager.login_message_category = 'warning'
 
+def format_time(value):
+    try:
+        return value[11:16]
+    except (TypeError, IndexError):
+        return '--:--'
+
 
 def create_app(config_name='default'):
     app = Flask(__name__)
@@ -34,6 +40,7 @@ def create_app(config_name='default'):
     with app.app_context():
         db.create_all()
         app.jinja_env.filters['format_date'] = format_date
+        app.jinja_env.filters['format_time'] = format_time
 
     return app
 

@@ -77,14 +77,14 @@
                     <div class="col-3">
                         <div class="stat-box">
                             <i class="bi bi-sunrise text-warning fs-4"></i>
-                            <div class="fw-bold">{{ weather.sunrise }}</div>
+                            <div class="fw-bold">{{ weather.sunrise | format_time }}</div>
                             <small class="text-muted">Восход</small>
                         </div>
                     </div>
                     <div class="col-3">
                         <div class="stat-box">
                             <i class="bi bi-sunset text-danger fs-4"></i>
-                            <div class="fw-bold">{{ weather.sunset }}</div>
+                            <div class="fw-bold">{{ weather.sunset | format_time }}</div>
                             <small class="text-muted">Закат</small>
                         </div>
                     </div>
@@ -94,9 +94,13 @@
                 <div class="mt-3 text-end">
                     {% set is_fav = current_user.favorite_cities | selectattr('city', 'equalto', weather.city) | list %}
                     {% if is_fav %}
-                        <span class="btn btn-warning btn-sm disabled">
-                            <i class="bi bi-star-fill me-1"></i>В избранном
-                        </span>
+                        <form method="POST" action="{{ url_for('profile.remove_favorite_by_city') }}" class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="city" value="{{ weather.city }}">
+                            <button type="submit" class="btn btn-warning btn-sm">
+                                <i class="bi bi-star-fill me-1"></i>В избранном
+                            </button>
+                        </form>
                     {% else %}
                         <form method="POST" action="{{ url_for('profile.add_favorite') }}" class="d-inline">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

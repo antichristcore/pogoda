@@ -1,6 +1,5 @@
 import requests
 from flask import current_app
-from datetime import datetime
 
 USE_MOCK = False
 
@@ -12,133 +11,249 @@ MOCK_WEATHER = {
     'humidity': 65,
     'wind_speed': 4.2,
     'description': 'Переменная облачность',
-    'icon': '02d',
-    'icon_url': 'https://openweathermap.org/img/wn/02d@2x.png',
-    'pressure': 1013,
+    'icon': '/static/img/weather/cloudy.svg',
+    'pressure': 759,
     'visibility': 10,
+    'sunrise': '06:00',
+    'sunset': '20:00',
+    'uv': 3,
 }
 
 MOCK_FORECAST = [
-    {'date': '2025-01-20', 'temp_min': 12, 'temp_max': 19, 'description': 'Ясно', 'icon': '01d', 'icon_url': 'https://openweathermap.org/img/wn/01d@2x.png', 'humidity': 55, 'wind_speed': 3.1},
-    {'date': '2025-01-21', 'temp_min': 10, 'temp_max': 17, 'description': 'Облачно', 'icon': '03d', 'icon_url': 'https://openweathermap.org/img/wn/03d@2x.png', 'humidity': 70, 'wind_speed': 5.0},
-    {'date': '2025-01-22', 'temp_min': 8,  'temp_max': 14, 'description': 'Дождь', 'icon': '10d', 'icon_url': 'https://openweathermap.org/img/wn/10d@2x.png', 'humidity': 85, 'wind_speed': 6.5},
-    {'date': '2025-01-23', 'temp_min': 11, 'temp_max': 16, 'description': 'Гроза', 'icon': '11d', 'icon_url': 'https://openweathermap.org/img/wn/11d@2x.png', 'humidity': 90, 'wind_speed': 8.0},
-    {'date': '2025-01-24', 'temp_min': 14, 'temp_max': 21, 'description': 'Ясно', 'icon': '01d', 'icon_url': 'https://openweathermap.org/img/wn/01d@2x.png', 'humidity': 50, 'wind_speed': 2.5},
+    {'date': '2025-01-20', 'temp_min': 12, 'temp_max': 19, 'description': 'Ясно', 'icon': '/static/img/weather/day.svg', 'humidity': 55, 'wind_speed': 3.1, 'pop': 0},
+    {'date': '2025-01-21', 'temp_min': 10, 'temp_max': 17, 'description': 'Облачно', 'icon': '/static/img/weather/cloudy.svg', 'humidity': 70, 'wind_speed': 5.0, 'pop': 20},
+    {'date': '2025-01-22', 'temp_min': 8, 'temp_max': 14, 'description': 'Дождь', 'icon': '/static/img/weather/rainy-1.svg', 'humidity': 85, 'wind_speed': 6.5, 'pop': 80},
+    {'date': '2025-01-23', 'temp_min': 11, 'temp_max': 16, 'description': 'Гроза', 'icon': '/static/img/weather/thunder.svg', 'humidity': 90, 'wind_speed': 8.0, 'pop': 90},
+    {'date': '2025-01-24', 'temp_min': 14, 'temp_max': 21, 'description': 'Ясно', 'icon': '/static/img/weather/day.svg', 'humidity': 50, 'wind_speed': 2.5, 'pop': 0},
 ]
 
+YANDEX_ICONS = {
+    'CLEAR': 'day.svg',
+    'PARTLY_CLOUDY': 'cloudy-day-1.svg',
+    'CLOUDY': 'cloudy-day-2.svg',
+    'OVERCAST': 'cloudy.svg',
+    'DRIZZLE': 'rainy-4.svg',
+    'LIGHT_RAIN': 'rainy-1.svg',
+    'RAIN': 'rainy-2.svg',
+    'MODERATE_RAIN': 'rainy-3.svg',
+    'HEAVY_RAIN': 'rainy-5.svg',
+    'CONTINUOUS_HEAVY_RAIN': 'rainy-6.svg',
+    'SHOWERS': 'rainy-7.svg',
+    'WET_SNOW': 'snowy-4.svg',
+    'LIGHT_SNOW': 'snowy-1.svg',
+    'SNOW': 'snowy-2.svg',
+    'SNOW_SHOWERS': 'snowy-3.svg',
+    'HAIL': 'snowy-6.svg',
+    'THUNDERSTORM': 'thunder.svg',
+    'THUNDERSTORM_WITH_RAIN': 'thunder.svg',
+    'THUNDERSTORM_WITH_HAIL': 'thunder.svg',
+}
 
-WEATHER_ICONS = {
-    '01d': 'day.svg',
-    '01n': 'night.svg',
-    '02d': 'cloudy-day-1.svg',
-    '02n': 'cloudy-night-1.svg',
-    '03d': 'cloudy-day-2.svg',
-    '03n': 'cloudy-night-2.svg',
-    '04d': 'cloudy.svg',
-    '04n': 'cloudy.svg',
-    '09d': 'rainy-4.svg',
-    '09n': 'rainy-4.svg',
-    '10d': 'rainy-1.svg',
-    '10n': 'rainy-1.svg',
-    '11d': 'thunder.svg',
-    '11n': 'thunder.svg',
-    '13d': 'snowy-1.svg',
-    '13n': 'snowy-1.svg',
-    '50d': 'cloudy-day-3.svg',
-    '50n': 'cloudy-night-3.svg',
+YANDEX_CONDITIONS = {
+    'CLEAR': 'Ясно',
+    'PARTLY_CLOUDY': 'Малооблачно',
+    'CLOUDY': 'Облачно с прояснениями',
+    'OVERCAST': 'Пасмурно',
+    'DRIZZLE': 'Морось',
+    'LIGHT_RAIN': 'Небольшой дождь',
+    'RAIN': 'Дождь',
+    'MODERATE_RAIN': 'Умеренный дождь',
+    'HEAVY_RAIN': 'Сильный дождь',
+    'CONTINUOUS_HEAVY_RAIN': 'Длительный сильный дождь',
+    'SHOWERS': 'Ливень',
+    'WET_SNOW': 'Дождь со снегом',
+    'LIGHT_SNOW': 'Небольшой снег',
+    'SNOW': 'Снег',
+    'SNOW_SHOWERS': 'Снегопад',
+    'HAIL': 'Град',
+    'THUNDERSTORM': 'Гроза',
+    'THUNDERSTORM_WITH_RAIN': 'Дождь с грозой',
+    'THUNDERSTORM_WITH_HAIL': 'Гроза с градом',
 }
 
 
 class WeatherService:
 
     def __init__(self):
-        self.api_key = current_app.config['OPENWEATHER_API_KEY']
-        self.base_url = current_app.config['OPENWEATHER_BASE_URL']
+        if not USE_MOCK:
+            self.yandex_key = current_app.config['YANDEX_WEATHER_API_KEY']
+            self.geocoder_key = current_app.config['YANDEX_GEOCODER_KEY']
 
-    def get_current_weather(self, city):
+    def _geocode(self, city: str) -> tuple | None:
+        try:
+            r = requests.get(
+                'https://geocode-maps.yandex.ru/1.x/',
+                params={
+                    'apikey': self.geocoder_key,
+                    'geocode': city,
+                    'format': 'json',
+                    'results': 1,
+                    'lang': 'ru_RU'
+                },
+                timeout=5
+            )
+            r.raise_for_status()
+            data = r.json()
+            members = data['response']['GeoObjectCollection']['featureMember']
+            if not members:
+                return None
+            obj = members[0]['GeoObject']
+            lon, lat = map(float, obj['Point']['pos'].split())
+            components = obj['metaDataProperty']['GeocoderMetaData']['Address']['Components']
+            name = next((c['name'] for c in components if c['kind'] == 'locality'), obj['name'])
+            country = next((c['name'] for c in components if c['kind'] == 'country'), '')
+            return lat, lon, name, country
+        except Exception as e:
+            print(f"Ошибка геокодера: {e}")
+            return None
+
+    def _yandex_query(self, lat, lon):
+        query = """
+        {
+          weatherByPoint(request: { lat: %.6f, lon: %.6f }) {
+            now {
+              temperature
+              feelsLike
+              humidity
+              pressure
+              windSpeed
+              condition
+              visibility
+              precProbability
+              uvIndex
+            }
+            forecast {
+              days(limit: 5) {
+                sunriseTime
+                sunsetTime
+                parts {
+                  day {
+                    temperature
+                    humidity
+                    windSpeed
+                    condition
+                    precProbability
+                  }
+                  night {
+                    temperature
+                  }
+                }
+              }
+            }
+          }
+        }
+        """ % (lat, lon)
+
+        try:
+            r = requests.post(
+                'https://api.weather.yandex.ru/graphql/query',
+                headers={'X-Yandex-Weather-Key': self.yandex_key},
+                json={'query': query},
+                timeout=10
+            )
+            r.raise_for_status()
+            return r.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Ошибка Яндекс погоды: {e}")
+            return None
+
+    def get_current_weather(self, city: str) -> dict | None:
         if USE_MOCK:
             data = MOCK_WEATHER.copy()
             data['city'] = city.capitalize()
             return data
 
-        params = {
-            'q': city,
-            'appid': self.api_key,
-            'units': 'metric',
-            'lang': 'ru'
-        }
-        try:
-            response = requests.get(f'{self.base_url}/weather', params=params, timeout=10)
-            response.raise_for_status()
-            data = response.json()
-            return self._parse_current(data)
-        except requests.exceptions.HTTPError as e:
-            if e.response.status_code == 404:
-                return {'error': 'Город не найден'}
+        geo = self._geocode(city)
+        if not geo:
+            return {'error': 'Город не найден'}
+
+        lat, lon, city_name, country = geo
+        data = self._yandex_query(lat, lon)
+
+        if not data or 'errors' in data:
             return {'error': 'Ошибка API погоды'}
-        except requests.exceptions.RequestException:
-            return {'error': 'Не удалось подключиться к сервису погоды'}
+
+        now = data['data']['weatherByPoint']['now']
+        days = data['data']['weatherByPoint']['forecast']['days']
+        condition = now.get('condition', 'CLEAR')
+
+        sunrise = days[0].get('sunriseTime', '--:--') if days else '--:--'
+        sunset = days[0].get('sunsetTime', '--:--') if days else '--:--'
+
+        return {
+            'city': city_name,
+            'country': country,
+            'temperature': now['temperature'],
+            'feels_like': now['feelsLike'],
+            'humidity': now['humidity'],
+            'wind_speed': round(now['windSpeed'], 1),
+            'description': YANDEX_CONDITIONS.get(condition, condition).capitalize(),
+            'icon': f"/static/img/weather/{YANDEX_ICONS.get(condition, 'cloudy.svg')}",
+            'pressure': now['pressure'],
+            'visibility': round(now.get('visibility', 0) / 1000, 1),
+            'sunrise': sunrise,
+            'sunset': sunset,
+            'uv': now.get('uvIndex', 0),
+        }
 
     def get_forecast(self, city):
         if USE_MOCK:
             return MOCK_FORECAST
 
-        params = {
-            'q': city,
-            'appid': self.api_key,
-            'units': 'metric',
-            'lang': 'ru',
-            'cnt': 40
-        }
-        try:
-            response = requests.get(f'{self.base_url}/forecast', params=params, timeout=10)
-            response.raise_for_status()
-            data = response.json()
-            return self._parse_forecast(data)
-        except requests.exceptions.RequestException:
+        geo = self._geocode(city)
+        if not geo:
             return None
 
-    def _parse_current(self, data):
-        sunrise = datetime.fromtimestamp(data['sys']['sunrise']).strftime('%H:%M')
-        sunset = datetime.fromtimestamp(data['sys']['sunset']).strftime('%H:%M')
-        return {
-            'city': data['name'],
-            'country': data['sys']['country'],
-            'temperature': round(data['main']['temp']),
-            'feels_like': round(data['main']['feels_like']),
-            'humidity': data['main']['humidity'],
-            'wind_speed': round(data['wind']['speed'], 1),
-            'description': data['weather'][0]['description'].capitalize(),
-            'icon': f"/static/img/weather/{WEATHER_ICONS.get(data['weather'][0]['icon'], 'cloudy.svg')}",
-            'icon_url': f"https://openweathermap.org/img/wn/{data['weather'][0]['icon']}@2x.png",
-            'pressure': data['main']['pressure'],
-            'visibility': data.get('visibility', 0) // 1000,
-            'sunrise': sunrise,
-            'sunset': sunset,
-        }
+        lat, lon, _, _ = geo
+        data = self._yandex_query(lat, lon)
 
-    def _parse_forecast(self, data):
-        daily = {}
-        for item in data['list']:
-            date = item['dt_txt'].split(' ')[0]
-            if date not in daily:
-                daily[date] = {
-                    'date': date,
-                    'temp_min': item['main']['temp_min'],
-                    'temp_max': item['main']['temp_max'],
-                    'description': item['weather'][0]['description'].capitalize(),
-                    'icon': f"/static/img/weather/{WEATHER_ICONS.get(item['weather'][0]['icon'], 'cloudy.svg')}",
-                    'icon_url': f"https://openweathermap.org/img/wn/{item['weather'][0]['icon']}@2x.png",
-                    'humidity': item['main']['humidity'],
-                    'wind_speed': round(item['wind']['speed'], 1),
-                    'pop': round(item.get('pop', 0) * 100),
-                }
-            else:
-                daily[date]['temp_min'] = min(daily[date]['temp_min'], item['main']['temp_min'])
-                daily[date]['temp_max'] = max(daily[date]['temp_max'], item['main']['temp_max'])
+        if not data or 'errors' in data:
+            return None
 
-        for d in daily.values():
-            d['temp_min'] = round(d['temp_min'])
-            d['temp_max'] = round(d['temp_max'])
+        days = data['data']['weatherByPoint']['forecast']['days']
+        result = []
+        for day in days:
+            day_part = day['parts']['day']
+            night_part = day['parts']['night']
+            condition = day_part.get('condition', 'CLEAR')
+            result.append({
+                'date': day.get('sunriseTime', '')[:10],
+                'temp_min': night_part.get('temperature', 0),
+                'temp_max': day_part.get('temperature', 0),
+                'description': YANDEX_CONDITIONS.get(condition, condition).capitalize(),
+                'icon': f"/static/img/weather/{YANDEX_ICONS.get(condition, 'cloudy.svg')}",
+                'humidity': day_part.get('humidity', 0),
+                'wind_speed': round(day_part.get('windSpeed', 0), 1),
+                'pop': round(day_part.get('precProbability', 0) * 100),
+            })
 
-        return list(daily.values())[:5]
+        return result
+
+    def search_cities(self, query):
+        if USE_MOCK:
+            mock_cities = ['Москва', 'Берлин', 'Лондон', 'Париж', 'Токио']
+            return [c for c in mock_cities if c.lower().startswith(query.lower())]
+        try:
+            r = requests.get(
+                'https://geocode-maps.yandex.ru/1.x/',
+                params={
+                    'apikey': self.geocoder_key,
+                    'geocode': query,
+                    'format': 'json',
+                    'results': 5,
+                    'lang': 'ru_RU'
+                },
+                timeout=5
+            )
+            r.raise_for_status()
+            data = r.json()
+            members = data['response']['GeoObjectCollection']['featureMember']
+            result = []
+            for m in members:
+                components = m['GeoObject']['metaDataProperty']['GeocoderMetaData']['Address']['Components']
+                name = next((c['name'] for c in components if c['kind'] == 'locality'), None)
+                if name:
+                    result.append(name)
+            return result
+        except Exception:
+            return []

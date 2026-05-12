@@ -117,3 +117,13 @@ def delete_account():
     db.session.commit()
     flash('Аккаунт удалён.', 'info')
     return redirect(url_for('main.index'))
+
+@profile_bp.route('/favorites/remove-by-city', methods=['POST'])
+@login_required
+def remove_favorite_by_city():
+    city = request.form.get('city', '').strip()
+    fav = FavoriteCity.query.filter_by(user_id=current_user.id, city=city).first()
+    if fav:
+        db.session.delete(fav)
+        db.session.commit()
+    return redirect(url_for('main.weather_page', city=city))
