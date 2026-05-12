@@ -29,7 +29,6 @@ main.container { flex: 1; }
 
 .navbar-brand { font-size: 1.3rem; }
 
-/* Search */
 .search-input {
     border-radius: var(--radius) 0 0 var(--radius) !important;
     border: 2px solid #e2e8f0;
@@ -72,7 +71,6 @@ main.container { flex: 1; }
 .stat-box .text-warning { color: #fde68a !important; }
 .stat-box .text-success { color: #86efac !important; }
 
-/* Forecast cards */
 .forecast-card {
     border: 1px solid #e2e8f0;
     border-radius: 0.75rem;
@@ -86,14 +84,12 @@ main.container { flex: 1; }
 }
 .forecast-icon { width: 52px; height: 52px; }
 
-/* Temp chart */
 .temp-chart-bar {
     border-radius: 6px 6px 0 0;
     background: linear-gradient(180deg, #4f46e5 0%, #a5b4fc 100%);
     min-height: 8px;
 }
 
-/* Feature cards */
 .feature-card {
     border: 1px solid #e2e8f0;
     border-radius: var(--radius);
@@ -106,7 +102,6 @@ main.container { flex: 1; }
     box-shadow: var(--shadow);
 }
 
-/* Auth cards */
 .auth-card {
     border: 1px solid #e2e8f0;
     border-radius: var(--radius);
@@ -137,4 +132,16 @@ main.container { flex: 1; }
 @media (max-width: 576px) {
     .temp-display { font-size: 2.2rem; }
     .weather-icon { width: 70px; height: 70px; }
+}
+
+.hover-item {
+    transition: background 0.15s;
+    color: var(--text-main);
+}
+.hover-item:hover {
+    background: #f1f5f9;
+}
+
+.col-md-2 {
+    max-width: 200px;
 }
