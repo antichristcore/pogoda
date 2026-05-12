@@ -74,6 +74,20 @@
                             <small class="text-muted">Видимость</small>
                         </div>
                     </div>
+                    <div class="col-3">
+                        <div class="stat-box">
+                            <i class="bi bi-sunrise text-warning fs-4"></i>
+                            <div class="fw-bold">{{ weather.sunrise }}</div>
+                            <small class="text-muted">Восход</small>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="stat-box">
+                            <i class="bi bi-sunset text-danger fs-4"></i>
+                            <div class="fw-bold">{{ weather.sunset }}</div>
+                            <small class="text-muted">Закат</small>
+                        </div>
+                    </div>
                 </div>
 
                 {% if current_user.is_authenticated %}
@@ -149,4 +163,6 @@
     </div>
 </div>
 {% endif %}
+
 {% endblock %}
+

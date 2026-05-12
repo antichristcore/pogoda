@@ -1,5 +1,6 @@
 import requests
 from flask import current_app
+from datetime import datetime
 
 USE_MOCK = False
 
@@ -98,6 +99,8 @@ class WeatherService:
             return None
 
     def _parse_current(self, data):
+        sunrise = datetime.fromtimestamp(data['sys']['sunrise']).strftime('%H:%M')
+        sunset = datetime.fromtimestamp(data['sys']['sunset']).strftime('%H:%M')
         return {
             'city': data['name'],
             'country': data['sys']['country'],
@@ -110,6 +113,8 @@ class WeatherService:
             'icon_url': f"https://openweathermap.org/img/wn/{data['weather'][0]['icon']}@2x.png",
             'pressure': data['main']['pressure'],
             'visibility': data.get('visibility', 0) // 1000,
+            'sunrise': sunrise,
+            'sunset': sunset,
         }
 
     def _parse_forecast(self, data):
@@ -126,6 +131,7 @@ class WeatherService:
                     'icon_url': f"https://openweathermap.org/img/wn/{item['weather'][0]['icon']}@2x.png",
                     'humidity': item['main']['humidity'],
                     'wind_speed': round(item['wind']['speed'], 1),
+                    'pop': round(item.get('pop', 0) * 100),
                 }
             else:
                 daily[date]['temp_min'] = min(daily[date]['temp_min'], item['main']['temp_min'])
