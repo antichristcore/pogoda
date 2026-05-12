@@ -1,0 +1,52 @@
+from flask import Blueprint, render_template, redirect, url_for, flash
+from flask_login import current_user, login_required
+from app.forms.forms import CitySearchForm
+from app.services.weather_service import WeatherService
+from app.models.user import SearchHistory
+from app import db
+
+main_bp = Blueprint('main', __name__)
+
+
+@main_bp.route('/', methods=['GET', 'POST'])
+def index():
+    form = CitySearchForm()
+    weather = None
+    forecast = None
+
+    if form.validate_on_submit():
+        city = form.city.data.strip()
+        service = WeatherService()
+        weather = service.get_current_weather(city)
+
+        if weather and 'error' not in weather:
+            forecast = service.get_forecast(city)
+            if current_user.is_authenticated:
+                history_entry = SearchHistory(user_id=current_user.id, city=weather['city'])
+                db.session.add(history_entry)
+                db.session.commit()
+        elif weather:
+            flash(weather['error'], 'danger')
+            weather = None
+
+    return render_template('index.html', form=form, weather=weather, forecast=forecast)
+
+
+@main_bp.route('/weather/<city>')
+def weather_page(city):
+    service = WeatherService()
+    weather = service.get_current_weather(city)
+    forecast = None
+
+    if weather and 'error' not in weather:
+        forecast = service.get_forecast(city)
+        if current_user.is_authenticated:
+            history_entry = SearchHistory(user_id=current_user.id, city=weather['city'])
+            db.session.add(history_entry)
+            db.session.commit()
+    else:
+        flash(weather.get('error', 'Неизвестная ошибка'), 'danger')
+        return redirect(url_for('main.index'))
+
+    form = CitySearchForm()
+    return render_template('index.html', form=form, weather=weather, forecast=forecast)
