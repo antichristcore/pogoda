@@ -7,6 +7,7 @@ from app.forms.forms import MultiCitySearchForm
 from app import db
 from flask_login import current_user
 from app.models.user import SearchHistory, FavoriteCity
+from datetime import datetime, timedelta
 
 main_bp = Blueprint('main', __name__)
 
@@ -16,6 +17,7 @@ def index():
     form = CitySearchForm()
     weather = None
     forecast = None
+    requested_at = None
     favorites = []
 
     if current_user.is_authenticated:
@@ -25,6 +27,7 @@ def index():
         city = form.city.data.strip()
         service = WeatherService()
         weather = service.get_current_weather(city)
+        requested_at = (datetime.utcnow() + timedelta(hours=4)).strftime('%H:%M')
 
         if weather and 'error' not in weather:
             forecast = service.get_forecast(city)
@@ -36,12 +39,13 @@ def index():
             flash(weather['error'], 'danger')
             weather = None
 
-    return render_template('index.html', form=form, weather=weather, forecast=forecast, favorites=favorites)
+    return render_template('index.html', form=form, weather=weather, forecast=forecast, favorites=favorites, requested_at=requested_at)
 
 @main_bp.route('/weather/<city>')
 def weather_page(city):
     service = WeatherService()
     weather = service.get_current_weather(city)
+    requested_at = (datetime.utcnow() + timedelta(hours=4)).strftime('%H:%M')
     forecast = None
     favorites = FavoriteCity.query.filter_by(user_id=current_user.id).all() if current_user.is_authenticated else []
 
@@ -56,7 +60,7 @@ def weather_page(city):
         return redirect(url_for('main.index'))
 
     form = CitySearchForm()
-    return render_template('index.html', form=form, weather=weather, forecast=forecast, favorites=favorites)
+    return render_template('index.html', form=form, weather=weather, forecast=forecast, favorites=favorites, requested_at=requested_at)
 
 
 @main_bp.route('/compare', methods=['GET', 'POST'])
