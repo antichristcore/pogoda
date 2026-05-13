@@ -145,3 +145,48 @@ main.container { flex: 1; }
 .col-md-2 {
     max-width: 200px;
 }
+[data-bs-theme="dark"] {
+    --bg: #0f172a;
+    --card-bg: #1e293b;
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
+    --nav-bg: #0f172a;
+}
+
+[data-bs-theme="dark"] .card {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+
+[data-bs-theme="dark"] .forecast-card {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+
+[data-bs-theme="dark"] .feature-card {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+
+[data-bs-theme="dark"] .search-input {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+[data-bs-theme="dark"] .search-input::placeholder {
+    color: #64748b;
+}
+
+[data-bs-theme="dark"] body {
+    background-color: #0f172a;
+}
+
+[data-bs-theme="dark"] .footer {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+
+[data-bs-theme="dark"] .hover-item:hover {
+    background: #334155;
+}

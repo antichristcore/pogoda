@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-bs-theme="{{ current_user.theme if current_user.is_authenticated else 'light' }}">
 <head>
     <meta charset="UTF-8">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
@@ -42,6 +42,21 @@
                         <a class="btn btn-outline-light btn-sm" href="{{url_for('auth.register')}}">
                             Регистрация
                         </a>
+                    </li>
+                {% endif %}
+                {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <form method="POST" action="{{ url_for('profile.set_theme') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="theme" value="{{ 'light' if current_user.theme == 'dark' else 'dark' }}">
+                            <button type="submit" class="btn btn-link nav-link">
+                                {% if current_user.theme == 'dark' %}
+                                    <i class="bi bi-sun"></i>
+                                {% else %}
+                                    <i class="bi bi-moon"></i>
+                                {% endif %}
+                            </button>
+                        </form>
                     </li>
                 {% endif %}
             </ul>

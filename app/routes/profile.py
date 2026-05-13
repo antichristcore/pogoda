@@ -128,3 +128,12 @@ def remove_favorite_by_city():
         db.session.delete(fav)
         db.session.commit()
     return redirect(url_for('main.weather_page', city=city))
+
+@profile_bp.route('/theme', methods=['POST'])
+@login_required
+def set_theme():
+    theme = request.form.get('theme')
+    if theme in ('light', 'dark'):
+        current_user.theme = theme
+        db.session.commit()
+    return redirect(request.referrer or url_for('main.index'))
