@@ -37,6 +37,12 @@
             </a>
         </div>
     </div>
+    <div class="col-auto">
+        <div class="card px-4 py-3 text-center" style="min-width:120px;">
+            <small class="text-muted">Вы с нами с</small>
+            <div class="fw-bold fs-6">{{ current_user.created_at.strftime('%d.%m.%Y') }}</div>
+        </div>
+    </div>
 </div>
 
 <div class="row">
