@@ -129,10 +129,11 @@ class WeatherService:
         return None
 
     def yandex_query(self, lat, lon):
-        query = """
-        {
-          weatherByPoint(request: { lat: %.6f, lon: %.6f }) {
-            now {
+        # НЕ ТРОГАТЬ, если код не работает, то достать из utils.txt
+        query = f"""
+        {{
+          weatherByPoint(request: {{ lat: {lat}, lon: {lon} }}) {{
+            now {{
               temperature
               feelsLike
               humidity
@@ -143,28 +144,28 @@ class WeatherService:
               precProbability
               uvIndex
               windGust
-            }
-            forecast {
-              days(limit: 5) {
+            }}
+            forecast {{
+              days(limit: 5) {{
                 sunriseTime
                 sunsetTime
-                parts {
-                  day {
+                parts {{
+                  day {{
                     temperature
                     humidity
                     windSpeed
                     condition
                     precProbability
-                  }
-                  night {
+                  }}
+                  night {{
                     temperature
-                  }
-                }
-              }
-            }
-          }
-        }
-        """ % (lat, lon)
+                  }}
+                }}
+              }}
+            }}
+          }}
+        }}
+        """
         for attempt in range(3):
             try:
                 r = requests.post(
