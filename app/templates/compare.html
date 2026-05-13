@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block title %}Сравнение городов — WeatherApp{% endblock %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h2 class="fw-bold mb-1">Сравнение городов</h2>
+        <p class="text-muted mb-4">Введите города через запятую — максимум 6</p>
+
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <div class="input-group input-group-lg shadow-sm mb-4">
+                {{ form.cities(class="form-control search-input", placeholder="Москва, Берлин, Токио...") }}
+                <button class="btn btn-primary px-4" type="submit"
+                        onclick="this.innerHTML='<span class=\'spinner-border spinner-border-sm me-2\'></span>Загрузка...'">
+                    <i class="bi bi-bar-chart me-1"></i>Сравнить
+                </button>
+            </div>
+        </form>
+
+        {% if results %}
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle text-center" style="table-layout: fixed; width: 100%;">
+                <thead>
+                    <tr>
+                        <th style="width: 140px;">Параметр</th>
+                        {% for w in results %}
+                        <th style="width: {{ (100 - 14) // results|length }}%;">
+                            <img src="{{ w.icon }}" style="width:48px;height:48px;display:block;margin:0 auto;">
+                            <div class="fw-bold">{{ w.city }}</div>
+                            <small class="text-muted">{{ w.country }}</small>
+                        </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><i class="bi bi-thermometer-half text-danger me-1"></i>Температура</td>
+                        {% for w in results %}
+                        <td><span class="fw-bold fs-5">{{ w.temperature }}°C</span></td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td><i class="bi bi-thermometer text-warning me-1"></i>Ощущается</td>
+                        {% for w in results %}
+                        <td>{{ w.feels_like }}°C</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td><i class="bi bi-cloud me-1"></i>Погода</td>
+                        {% for w in results %}
+                        <td><small>{{ w.description }}</small></td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td><i class="bi bi-droplet-fill text-primary me-1"></i>Влажность</td>
+                        {% for w in results %}
+                        <td>{{ w.humidity }}%</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td><i class="bi bi-wind text-info me-1"></i>Ветер</td>
+                        {% for w in results %}
+                        <td>{{ w.wind_speed }} м/с</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td><i class="bi bi-speedometer2 text-warning me-1"></i>Давление</td>
+                        {% for w in results %}
+                        <td>{{ w.pressure }} мм</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td><i class="bi bi-eye text-success me-1"></i>Видимость</td>
+                        {% for w in results %}
+                        <td>{{ w.visibility }} км</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td><i class="bi bi-umbrella text-primary me-1"></i>Осадки</td>
+                        {% for w in results %}
+                        <td>{{ w.prec_probability }}%</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td><i class="bi bi-sunrise text-warning me-1"></i>Восход</td>
+                        {% for w in results %}
+                        <td>{{ w.sunrise | format_time }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td><i class="bi bi-sunset text-danger me-1"></i>Закат</td>
+                        {% for w in results %}
+                        <td>{{ w.sunset | format_time }}</td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

@@ -35,3 +35,7 @@ class ChangePasswordForm(FlaskForm):
 class CitySearchForm(FlaskForm):
     city = StringField('Город', validators=[DataRequired(), Length(min=2, max=100)])
     submit = SubmitField('Узнать погоду')
+
+class MultiCitySearchForm(FlaskForm):
+    cities = StringField('Города', validators=[DataRequired()])
+    submit = SubmitField('Сравнить')

@@ -3,6 +3,7 @@ from flask_login import current_user, login_required
 from app.forms.forms import CitySearchForm
 from app.services.weather_service import WeatherService
 from app.models.user import SearchHistory
+from app.forms.forms import MultiCitySearchForm
 from app import db
 from flask_login import current_user
 from app.models.user import SearchHistory, FavoriteCity
@@ -56,3 +57,30 @@ def weather_page(city):
 
     form = CitySearchForm()
     return render_template('index.html', form=form, weather=weather, forecast=forecast, favorites=favorites)
+
+
+@main_bp.route('/compare', methods=['GET', 'POST'])
+def compare():
+    form = MultiCitySearchForm()
+    results = []
+    errors = []
+
+    if form.validate_on_submit():
+        cities = [c.strip() for c in form.cities.data.split(',') if c.strip()]
+        cities = cities[:6]
+        service = WeatherService()
+        for city in cities:
+            weather = service.get_current_weather(city)
+            if weather and 'error' not in weather:
+                if current_user.is_authenticated:
+                    history_entry = SearchHistory(user_id=current_user.id, city=weather['city'])
+                    db.session.add(history_entry)
+                results.append(weather)
+            else:
+                errors.append(city)
+        if current_user.is_authenticated:
+            db.session.commit()
+        if errors:
+            flash(f'Не удалось получить погоду для: {", ".join(errors)}', 'warning')
+
+    return render_template('compare.html', form=form, results=results)

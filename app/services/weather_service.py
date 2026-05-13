@@ -1,6 +1,6 @@
 import requests
 from flask import current_app
-
+import time
 USE_MOCK = False
 
 MOCK_WEATHER = {
@@ -97,35 +97,38 @@ class WeatherService:
             self.yandex_key = current_app.config['YANDEX_WEATHER_API_KEY']
             self.geocoder_key = current_app.config['YANDEX_GEOCODER_KEY']
 
-    def _geocode(self, city: str) -> tuple | None:
-        try:
-            r = requests.get(
-                'https://geocode-maps.yandex.ru/1.x/',
-                params={
-                    'apikey': self.geocoder_key,
-                    'geocode': city,
-                    'format': 'json',
-                    'results': 1,
-                    'lang': 'ru_RU'
-                },
-                timeout=5
-            )
-            r.raise_for_status()
-            data = r.json()
-            members = data['response']['GeoObjectCollection']['featureMember']
-            if not members:
-                return None
-            obj = members[0]['GeoObject']
-            lon, lat = map(float, obj['Point']['pos'].split())
-            components = obj['metaDataProperty']['GeocoderMetaData']['Address']['Components']
-            name = next((c['name'] for c in components if c['kind'] == 'locality'), obj['name'])
-            country = next((c['name'] for c in components if c['kind'] == 'country'), '')
-            return lat, lon, name, country
-        except Exception as e:
-            print(f"Ошибка геокодера: {e}")
-            return None
+    def geocode(self, city):
+        for attempt in range(3):
+            try:
+                r = requests.get(
+                    'https://geocode-maps.yandex.ru/1.x/',
+                    params={
+                        'apikey': self.geocoder_key,
+                        'geocode': city,
+                        'format': 'json',
+                        'results': 1,
+                        'lang': 'ru_RU'
+                    },
+                    timeout=10
+                )
+                r.raise_for_status()
+                data = r.json()
+                members = data['response']['GeoObjectCollection']['featureMember']
+                if not members:
+                    return None
+                obj = members[0]['GeoObject']
+                lon, lat = map(float, obj['Point']['pos'].split())
+                components = obj['metaDataProperty']['GeocoderMetaData']['Address']['Components']
+                name = next((c['name'] for c in components if c['kind'] == 'locality'), obj['name'])
+                country = next((c['name'] for c in components if c['kind'] == 'country'), '')
+                return lat, lon, name, country
+            except Exception as e:
+                print(f"Ошибка геокодера: {e}")
+                print(f"Геокодер попытка {attempt + 1}: {e}")
+                time.sleep(1)
+        return None
 
-    def _yandex_query(self, lat, lon):
+    def yandex_query(self, lat, lon):
         query = """
         {
           weatherByPoint(request: { lat: %.6f, lon: %.6f }) {
@@ -162,19 +165,21 @@ class WeatherService:
           }
         }
         """ % (lat, lon)
-
-        try:
-            r = requests.post(
-                'https://api.weather.yandex.ru/graphql/query',
-                headers={'X-Yandex-Weather-Key': self.yandex_key},
-                json={'query': query},
-                timeout=10
-            )
-            r.raise_for_status()
-            return r.json()
-        except requests.exceptions.RequestException as e:
-            print(f"Ошибка Яндекс погоды: {e}")
-            return None
+        for attempt in range(3):
+            try:
+                r = requests.post(
+                    'https://api.weather.yandex.ru/graphql/query',
+                    headers={'X-Yandex-Weather-Key': self.yandex_key},
+                    json={'query': query},
+                    timeout=10
+                )
+                r.raise_for_status()
+                return r.json()
+            except requests.exceptions.RequestException as e:
+                print(f"Ошибка Яндекс погоды: {e}")
+                print(f"Яндекс погода попытка {attempt + 1}: {e}")
+                time.sleep(1)
+        return None
 
     def get_current_weather(self, city: str) -> dict | None:
         if USE_MOCK:
@@ -182,12 +187,12 @@ class WeatherService:
             data['city'] = city.capitalize()
             return data
 
-        geo = self._geocode(city)
+        geo = self.geocode(city)
         if not geo:
             return {'error': 'Город не найден'}
 
         lat, lon, city_name, country = geo
-        data = self._yandex_query(lat, lon)
+        data = self.yandex_query(lat, lon)
 
         if not data or 'errors' in data:
             return {'error': 'Ошибка API погоды'}
@@ -223,12 +228,12 @@ class WeatherService:
         if USE_MOCK:
             return MOCK_FORECAST
 
-        geo = self._geocode(city)
+        geo = self.geocode(city)
         if not geo:
             return None
 
         lat, lon, _, _ = geo
-        data = self._yandex_query(lat, lon)
+        data = self.yandex_query(lat, lon)
 
         if not data or 'errors' in data:
             return None
