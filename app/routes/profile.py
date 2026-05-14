@@ -1,7 +1,7 @@
 import os
 from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
 from flask_login import login_required, current_user, logout_user
-from app.models.user import SearchHistory, FavoriteCity
+from app.models.models import SearchHistory, FavoriteCity
 from werkzeug.utils import secure_filename
 from app import db
 from app.forms.forms import ChangePasswordForm

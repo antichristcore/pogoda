@@ -2,11 +2,11 @@ from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import current_user, login_required
 from app.forms.forms import CitySearchForm
 from app.services.weather_service import WeatherService
-from app.models.user import SearchHistory
+from app.models.models import SearchHistory
 from app.forms.forms import MultiCitySearchForm
 from app import db
 from flask_login import current_user
-from app.models.user import SearchHistory, FavoriteCity
+from app.models.models import SearchHistory, FavoriteCity
 from datetime import datetime, timedelta
 
 main_bp = Blueprint('main', __name__)
