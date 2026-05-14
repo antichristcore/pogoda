@@ -8,7 +8,7 @@
     --text-main: #0f172a;
     --text-muted: #64748b;
     --radius: 1rem;
-    --shadow: 0 2px 16px rgba(0,0,0,0.07);
+    --bs-box-shadow-sm: none;
 }
 
 body {
